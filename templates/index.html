@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet Plan Calendar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Diet Plan Calendar</h1>
+        <form id="dietForm">
+            <label for="calory_limit">Enter your daily calorie limit:</label>
+            <input type="number" id="calory_limit" name="calory_limit" required>
+            <button type="submit">Generate Diet Plan</button>
+        </form>
+        
+        <div class="calendar" id="calendar"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
