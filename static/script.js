@@ -5,9 +5,10 @@ document.addEventListener("DOMContentLoaded", function () {
     event.preventDefault(); // Prevent form submission
 
     const caloryLimit = document.getElementById("caloryLimit").value;
+    const dietType = document.getElementById("dietType").value; // Get selected diet type
 
-    if (!caloryLimit) {
-      alert("Please enter a calorie limit.");
+    if (!caloryLimit || !dietType) {
+      alert("Please enter a calorie limit and select a diet type.");
       return;
     }
 
@@ -15,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     fetch("/api/diet-plan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ calory_limit: caloryLimit }),
+      body: JSON.stringify({ calory_limit: caloryLimit, diet_type: dietType }), // Include diet type
     })
       .then((response) => response.json())
       .then((data) => {
@@ -38,7 +39,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const macros = day.macros
               ? `<p><strong>Macros:</strong> Protein: ${day.macros.protein}g, Carbs: ${day.macros.carbs}g, Fats: ${day.macros.fats}g</p>`
               : "";
-            const notes = day.notes ? `<p><strong>Notes:</strong> ${day.notes}</p>` : "";
+            const notes = day.notes
+              ? `<p><strong>Notes:</strong> ${day.notes}</p>`
+              : "";
 
             // Group meals into their categories (Breakfast, Lunch, Dinner, Snack)
             const mealSections = {

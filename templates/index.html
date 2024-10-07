@@ -9,7 +9,7 @@
   <body>
     <div class="container">
       <h1>Weekly Diet Plan</h1>
-      <!-- Form for entering calorie limit -->
+      <!-- Form for entering calorie limit and selecting diet type -->
       <form id="calorieForm">
         <input
           type="number"
@@ -17,6 +17,15 @@
           placeholder="Enter calorie limit"
           required
         />
+        <select id="dietType" required>
+          <option value="">Select Diet Type</option>
+          <option value="ketogenic">Ketogenic</option>
+          <option value="paleo">Paleo</option>
+          <option value="vegetarian">Vegetarian</option>
+          <option value="vegan">Vegan</option>
+          <option value="mediterranean">Mediterranean</option>
+          <option value="dash">DASH</option>
+        </select>
         <button type="submit">Generate Diet Plan</button>
       </form>
 

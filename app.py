@@ -49,7 +49,7 @@ def extract_and_parse_json(content):
         logging.debug(f"Cleaned JSON string: {cleaned_json_str}")
         return None
 
-def get_diet_plan(calory_limit):
+def get_diet_plan(calory_limit, diet_type):
     """Fetches the diet plan from the Perplexity API."""
     url = "https://api.perplexity.ai/chat/completions"
     payload = {
@@ -68,8 +68,10 @@ def get_diet_plan(calory_limit):
             },
             {
                 "role": "user",
-                "content": f"Create a 7-day diet plan for a daily calorie limit of {calory_limit} calories. "
-                           "Each day should include meals, snacks, macros, and notes. Make sure to make every meal content different."
+                "content": (
+                    f"Create a 7-day {diet_type} diet plan for a daily calorie limit of {calory_limit} calories. "
+                    "Each day should include meals, snacks, macros, and notes. Make sure to make every meal content different."
+                )
             },
         ],
         "max_tokens": 5000,
@@ -111,14 +113,18 @@ def get_diet_plan(calory_limit):
 
 @app.route('/api/diet-plan', methods=['POST'])
 def api_diet_plan():
-    """API endpoint to get the diet plan based on calorie limit."""
+    """API endpoint to get the diet plan based on calorie limit and diet type."""
     try:
         calory_limit = request.json.get('calory_limit')
+        diet_type = request.json.get('diet_type')  # Get diet type from request
         
         if calory_limit is None:
             return jsonify({"error": "Calorie limit not provided."}), 400
         
-        diet_plan_days = get_diet_plan(calory_limit)
+        if diet_type is None:
+            return jsonify({"error": "Diet type not provided."}), 400
+        
+        diet_plan_days = get_diet_plan(calory_limit, diet_type)  # Pass diet type to the function
         
         if diet_plan_days:
             return jsonify({"days": diet_plan_days})
