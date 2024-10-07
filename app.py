@@ -69,7 +69,7 @@ def get_diet_plan(calory_limit):
             {
                 "role": "user",
                 "content": f"Create a 7-day diet plan for a daily calorie limit of {calory_limit} calories. "
-                           "Each day should include meals, snacks, macros, and notes."
+                           "Each day should include meals, snacks, macros, and notes. Make sure to make every meal content different."
             },
         ],
         "max_tokens": 5000,

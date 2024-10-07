@@ -1,14 +1,17 @@
 /* Basic container styling */
 .container {
-  max-width: 1200px;
+  max-width: 100vw; /* Full window width */
   margin: 0 auto;
   padding: 20px;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 /* Title styling */
 h1 {
   text-align: center;
   margin-bottom: 20px;
+  font-size: 2em;
+  color: #333;
 }
 
 /* Form styling */
@@ -20,46 +23,71 @@ h1 {
 
 #calorieForm input {
   margin-right: 10px;
-  padding: 5px;
+  padding: 8px;
+  font-size: 1em;
 }
 
 #calorieForm button {
-  padding: 5px 10px;
+  padding: 8px 15px;
+  font-size: 1em;
   cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s;
 }
 
-/* Grid layout for the diet plan */
+#calorieForm button:hover {
+  background-color: #45a049;
+}
+
+/* Dynamic grid layout for the diet plan */
 .diet-plan-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr); /* 7 columns for 7 days of the week */
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Flexible grid */
+  gap: 20px; /* Space between days */
   margin-top: 20px;
+  width: 100%; /* Full width */
 }
 
 /* Each day in the grid */
 .day-plan {
   border: 1px solid #ccc;
-  padding: 15px;
+  padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add some shadow for better visuals */
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex; /* Flexbox for internal content alignment */
+  flex-direction: column; /* Stack elements vertically */
 }
 
-/* Title for each day (e.g., Day 1, Day 2) */
+/* Add hover effect to make it look interactive */
+.day-plan:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Title for each day */
 .day-plan h3 {
   text-align: center;
-  font-size: 1.2em;
-  margin-bottom: 10px;
+  font-size: 1.5em;
+  margin-bottom: 15px;
+  color: #2c3e50;
 }
 
 /* Meal section headers */
 .day-plan h4 {
-  font-size: 1.1em;
-  margin-top: 10px;
-  margin-bottom: 5px;
-  border-bottom: 1px solid #ccc;
+  font-size: 1.3em;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
+  color: #34495e;
 }
 
-/* Remove list styles from the meal lists */
+/* List of meals */
 .day-plan ul {
   list-style-type: none;
   padding: 0;
@@ -67,12 +95,15 @@ h1 {
 }
 
 .day-plan ul li {
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  font-size: 1.1em;
+  color: #555;
 }
 
 /* Styling for macros and notes */
 .day-plan p {
-  margin-top: 10px;
-  font-size: 0.9em;
-  color: #555;
+  margin-top: 15px;
+  font-size: 1em;
+  color: #777;
+  line-height: 1.4;
 }
