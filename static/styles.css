@@ -1,60 +1,78 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-}
-
+/* Basic container styling */
 .container {
-  max-width: 1000px;
-  margin: auto;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 20px;
 }
 
+/* Title styling */
 h1 {
   text-align: center;
-  font-size: 2rem;
+  margin-bottom: 20px;
 }
 
-form {
-  margin-bottom: 20px;
+/* Form styling */
+#calorieForm {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  margin-bottom: 30px;
 }
 
-form input,
-form button {
-  padding: 10px;
-  font-size: 1rem;
+#calorieForm input {
+  margin-right: 10px;
+  padding: 5px;
 }
 
-#calendar {
+#calorieForm button {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+/* Grid layout for the diet plan */
+.diet-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 columns for 7 days of the week */
+  gap: 15px;
   margin-top: 20px;
-  padding: 10px;
+}
+
+/* Each day in the grid */
+.day-plan {
   border: 1px solid #ccc;
-  background-color: white; /* Ensure visibility */
-  min-height: 500px; /* Set a minimum height */
-}
-
-.fc-daygrid-day {
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-}
-
-.fc-event-title {
-  background-color: #e1f5fe;
+  padding: 15px;
+  background-color: #f9f9f9;
   border-radius: 8px;
-  padding: 10px;
-  text-align: left;
-  font-size: 0.9rem;
 }
 
-.fc-event-title strong {
-  color: #00796b;
-  display: block;
+/* Title for each day (e.g., Day 1, Day 2) */
+.day-plan h3 {
+  text-align: center;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+/* Meal section headers */
+.day-plan h4 {
+  font-size: 1.1em;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Remove list styles from the meal lists */
+.day-plan ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.day-plan ul li {
   margin-bottom: 5px;
 }
 
-.fc-event-title br {
-  margin-bottom: 10px;
+/* Styling for macros and notes */
+.day-plan p {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #555;
 }

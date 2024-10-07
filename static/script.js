@@ -2,10 +2,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("calorieForm");
 
   form.addEventListener("submit", function (event) {
-    event.preventDefault(); // Prevent form from submitting normally
+    event.preventDefault(); // Prevent form submission
 
     const caloryLimit = document.getElementById("caloryLimit").value;
 
+    if (!caloryLimit) {
+      alert("Please enter a calorie limit.");
+      return;
+    }
+
+    // Make the POST request to fetch the diet plan
     fetch("/api/diet-plan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -14,75 +20,77 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
-          alert("Error: " + data.error); // Show error message to the user
+          alert("Error: " + data.error);
           return;
         }
 
         if (data.days) {
           const dietPlan = data.days;
+          const dietPlanGrid = document.getElementById("dietPlanGrid");
+          dietPlanGrid.innerHTML = ""; // Clear previous data
 
-          // Log the received diet plan
-          console.log("Received diet plan:", dietPlan);
-
-          // Create events for each day
-          const calendarEvents = dietPlan.map((day) => {
-            const date = new Date(day.day * 1000); // Convert timestamp to Date object
-
-            const meals = day.meals
-              .map(
-                (meal) => `<strong>${meal.type}:</strong> ${meal.description}`
-              )
-              .join("<br>");
-
-            const snacks = day.snacks
-              .map(
-                (snack) =>
-                  `<strong>${snack.type}:</strong> ${snack.description}`
-              )
-              .join("<br>");
+          // Render the diet plan for each day
+          dietPlan.forEach((day, index) => {
+            const date = new Date(day.day * 1000).toDateString(); // Convert Unix timestamp to date
+            const meals = day.meals;
+            const snacks = day.snacks;
 
             const macros = day.macros
-              ? `<strong>Macros:</strong> Protein: ${day.macros.protein}, Carbs: ${day.macros.carbs}, Fats: ${day.macros.fats}`
+              ? `<p><strong>Macros:</strong> Protein: ${day.macros.protein}g, Carbs: ${day.macros.carbs}g, Fats: ${day.macros.fats}g</p>`
               : "";
+            const notes = day.notes ? `<p><strong>Notes:</strong> ${day.notes}</p>` : "";
 
-            const notes = day.notes
-              ? `<strong>Notes:</strong> ${day.notes}`
-              : "";
-
-            return {
-              title: "", // No title; we use eventContent for full display
-              start: date,
-              allDay: true,
-              extendedProps: { meals, snacks, macros, notes },
+            // Group meals into their categories (Breakfast, Lunch, Dinner, Snack)
+            const mealSections = {
+              Breakfast: [],
+              Lunch: [],
+              Dinner: [],
+              Snack: [],
             };
+
+            // Safely push meals into corresponding sections
+            meals.forEach((meal) => {
+              if (mealSections[meal.type]) {
+                mealSections[meal.type].push(`<li>${meal.description}</li>`);
+              } else {
+                console.warn(`Unknown meal type: ${meal.type}`); // Log unknown meal types for debugging
+              }
+            });
+
+            // Safely push snacks into Snack section
+            snacks.forEach((snack) => {
+              if (mealSections["Snack"]) {
+                mealSections["Snack"].push(`<li>${snack.description}</li>`);
+              } else {
+                console.warn("Snack type issue.");
+              }
+            });
+
+            // Create the HTML for the day's meals and snacks
+            const dayContainer = `
+              <div class="day-plan">
+                <h3>Day ${index + 1}: ${date}</h3>
+                <h4>Breakfast</h4>
+                <ul>${mealSections.Breakfast.join("")}</ul>
+                <h4>Lunch</h4>
+                <ul>${mealSections.Lunch.join("")}</ul>
+                <h4>Dinner</h4>
+                <ul>${mealSections.Dinner.join("")}</ul>
+                <h4>Snacks</h4>
+                <ul>${mealSections.Snack.join("")}</ul>
+                ${macros}
+                ${notes}
+              </div>
+            `;
+
+            // Add the day container to the grid
+            dietPlanGrid.innerHTML += dayContainer;
           });
-
-          // Log the generated calendar events
-          console.log(
-            "Calendar Events:",
-            JSON.stringify(calendarEvents, null, 2)
-          );
-
-          // Initialize FullCalendar
-          const calendarEl = document.getElementById("calendar");
-          const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: "dayGridMonth",
-            events: calendarEvents, // Pass in the generated events
-            eventContent(arg) {
-              let contentHtml = `
-                                <div class="fc-event-title">
-                                    ${arg.event.extendedProps.meals}<br>
-                                    ${arg.event.extendedProps.snacks}<br>
-                                    ${arg.event.extendedProps.macros}<br>
-                                    ${arg.event.extendedProps.notes}
-                                </div>`;
-              return { html: contentHtml };
-            },
-          });
-
-          calendar.render();
         }
       })
-      .catch((error) => console.error("Error fetching diet plan:", error));
+      .catch((error) => {
+        console.error("Error fetching diet plan:", error);
+        alert("An error occurred while fetching the diet plan.");
+      });
   });
 });

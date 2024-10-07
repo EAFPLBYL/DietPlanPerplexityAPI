@@ -4,19 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Diet Plan Calendar</title>
-    <!-- Include FullCalendar CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body>
     <div class="container">
-      <h1>Diet Plan Calendar</h1>
+      <h1>Weekly Diet Plan</h1>
       <form id="calorieForm">
         <input
           type="number"
@@ -26,10 +18,12 @@
         />
         <button type="submit">Generate Diet Plan</button>
       </form>
-      <div id="calendar"></div>
+
+      <!-- Placeholder for the grid to display the diet plan -->
+      <div id="dietPlanGrid" class="diet-plan-grid"></div>
     </div>
-    <!-- Include FullCalendar JS -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+    <!-- Link the script file correctly -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
   </body>
 </html>
