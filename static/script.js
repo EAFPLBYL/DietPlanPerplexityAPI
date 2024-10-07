@@ -1,61 +1,88 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById('calorieForm');
-    
-    form.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent form from submitting normally
-        
-        const caloryLimit = document.getElementById('caloryLimit').value;
-        
-        fetch('/api/diet-plan', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("calorieForm");
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent form from submitting normally
+
+    const caloryLimit = document.getElementById("caloryLimit").value;
+
+    fetch("/api/diet-plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ calory_limit: caloryLimit }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert("Error: " + data.error); // Show error message to the user
+          return;
+        }
+
+        if (data.days) {
+          const dietPlan = data.days;
+
+          // Log the received diet plan
+          console.log("Received diet plan:", dietPlan);
+
+          // Create events for each day
+          const calendarEvents = dietPlan.map((day) => {
+            const date = new Date(day.day * 1000); // Convert timestamp to Date object
+
+            const meals = day.meals
+              .map(
+                (meal) => `<strong>${meal.type}:</strong> ${meal.description}`
+              )
+              .join("<br>");
+
+            const snacks = day.snacks
+              .map(
+                (snack) =>
+                  `<strong>${snack.type}:</strong> ${snack.description}`
+              )
+              .join("<br>");
+
+            const macros = day.macros
+              ? `<strong>Macros:</strong> Protein: ${day.macros.protein}, Carbs: ${day.macros.carbs}, Fats: ${day.macros.fats}`
+              : "";
+
+            const notes = day.notes
+              ? `<strong>Notes:</strong> ${day.notes}`
+              : "";
+
+            return {
+              title: "", // No title; we use eventContent for full display
+              start: date,
+              allDay: true,
+              extendedProps: { meals, snacks, macros, notes },
+            };
+          });
+
+          // Log the generated calendar events
+          console.log(
+            "Calendar Events:",
+            JSON.stringify(calendarEvents, null, 2)
+          );
+
+          // Initialize FullCalendar
+          const calendarEl = document.getElementById("calendar");
+          const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: "dayGridMonth",
+            events: calendarEvents, // Pass in the generated events
+            eventContent(arg) {
+              let contentHtml = `
+                                <div class="fc-event-title">
+                                    ${arg.event.extendedProps.meals}<br>
+                                    ${arg.event.extendedProps.snacks}<br>
+                                    ${arg.event.extendedProps.macros}<br>
+                                    ${arg.event.extendedProps.notes}
+                                </div>`;
+              return { html: contentHtml };
             },
-            body: JSON.stringify({ calory_limit: caloryLimit })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Received data from API:", data); // Debugging step
-            
-            if (data.days) {
-                const dietPlan = data.days;
-                console.log("Diet Plan Days:", dietPlan); // Log the diet plan to ensure it's structured correctly
-                
-                // Create events from the diet plan
-                const calendarEvents = dietPlan.map(day => {
-                    const date = new Date(day.day * 1000); // Convert timestamp to Date object
-                    return {
-                        title: `Meals:\n${day.meals.map(m => `${m.type}: ${m.description}`).join('\n')}\nSnacks:\n${day.snacks.map(s => `${s.type}: ${s.description}`).join('\n')}\nNotes:\n${day.notes}`,
-                        start: date,
-                        allDay: true, // Makes sure it displays the whole day event
-                    };
-                });
-                
-                console.log("Calendar Events:", calendarEvents); // Log the calendar events to make sure they're structured correctly
+          });
 
-                // Initialize FullCalendar
-                const calendarEl = document.getElementById('calendar');
-                const calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'dayGridMonth',
-                    events: calendarEvents,
-                    eventContent: function(arg) {
-                        return { html: `<div class="fc-event-title">${arg.event.title}</div>` };
-                    }
-                });
-
-                calendar.render();
-            } else {
-                console.error("No 'days' key found in API response.");
-            }
-            
-        })
-        .catch(error => {
-            console.error('Error fetching or processing data:', error);
-        });
-    });
+          calendar.render();
+        }
+      })
+      .catch((error) => console.error("Error fetching diet plan:", error));
+  });
 });

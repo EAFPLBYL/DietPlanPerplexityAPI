@@ -19,25 +19,31 @@ def clean_json_string(json_str):
     json_str = json_str.replace("'", '"')  # Replace single quotes with double quotes
     json_str = re.sub(r',\s*}', '}', json_str)  # Remove trailing commas
     json_str = re.sub(r',\s*]', ']', json_str)
+    # Remove "g" from macros (protein, carbs, fats)
+    json_str = re.sub(r'(\d+)g', r'\1', json_str)
     return json_str
 
 def extract_and_parse_json(content):
     """Extracts and parses JSON from the content."""
-    json_match = re.search(r'\{.*\}', content, re.DOTALL)  # Adjust regex to match JSON objects directly
+    json_match = re.search(r'\{.*\}', content, re.DOTALL)  # Match the JSON
     if not json_match:
         logging.error("No JSON content found in the response.")
         return None
 
-    json_str = json_match.group(0)  # Use group(0) to capture entire match
+    json_str = json_match.group(0)  # Use group(0) to capture the entire match
     cleaned_json_str = clean_json_string(json_str)
+    logging.debug(f"Cleaned JSON: {cleaned_json_str}")  # Log cleaned string
 
     try:
         parsed_json = json.loads(cleaned_json_str)
+        logging.debug(f"Parsed JSON: {parsed_json}")  # Log parsed result
+
         if 'days' in parsed_json:
             return parsed_json['days']
         else:
             logging.error("JSON does not contain 'days' key")
             return None
+
     except json.JSONDecodeError as e:
         logging.error(f"JSON decoding failed: {e}")
         logging.debug(f"Cleaned JSON string: {cleaned_json_str}")
@@ -56,15 +62,15 @@ def get_diet_plan(calory_limit):
                     "'days' should be an array of objects, each containing: "
                     "'day' (a UNIX timestamp), 'meals' (an array of objects with 'type' and 'description'), "
                     "'snacks' (an array of objects with 'type' and 'description'), "
-                    "'macros' (an object with keys 'protein', 'carbs', 'fats'), and 'notes' (a string). "
-                    "Do not include any additional text or comments outside this JSON structure."
-                )
+                    "'macros' (an object with numeric values for 'protein', 'carbs', and 'fats'), "
+                    "and 'notes' (a string). Do not include any additional text or comments outside this JSON structure."
+                ),
             },
             {
                 "role": "user",
                 "content": f"Create a 7-day diet plan for a daily calorie limit of {calory_limit} calories. "
                            "Each day should include meals, snacks, macros, and notes."
-            }
+            },
         ],
         "max_tokens": 5000,
         "temperature": 0.5,
@@ -87,12 +93,12 @@ def get_diet_plan(calory_limit):
         response.raise_for_status()  # Raise an error for bad responses
         data = response.json()
         logging.debug("API Response: %s", data)
-
+        
         choice = data['choices'][0]
         content = choice['message']['content']
-
+        
         diet_plan_days = extract_and_parse_json(content)
-
+        
         if diet_plan_days:
             return diet_plan_days
         else:
@@ -122,7 +128,8 @@ def api_diet_plan():
     
     except Exception as e:
         logging.error(f"Exception occurred: {e}")
-        return jsonify({"error": "An error occurred while processing your request."}), 500
+        
+    return jsonify({"error": "An error occurred while processing your request."}), 500
 
 @app.route('/')
 def index():

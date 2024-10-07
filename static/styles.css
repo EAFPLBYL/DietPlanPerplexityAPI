@@ -1,40 +1,60 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
 }
 
 .container {
-    max-width: 1000px;
-    margin: auto;
-    padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
 }
 
 h1 {
-    text-align: center;
+  text-align: center;
+  font-size: 2rem;
 }
 
 form {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
-.calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
+form input,
+form button {
+  padding: 10px;
+  font-size: 1rem;
 }
 
-.day {
-    background-color: #ffffff;
-    border-radius: 5px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+#calendar {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: white; /* Ensure visibility */
+  min-height: 500px; /* Set a minimum height */
 }
 
-.day h4 {
-    margin-top: 0;
+.fc-daygrid-day {
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
 }
 
-.day p {
-    margin-bottom: 5px;
+.fc-event-title {
+  background-color: #e1f5fe;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.fc-event-title strong {
+  color: #00796b;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.fc-event-title br {
+  margin-bottom: 10px;
 }
