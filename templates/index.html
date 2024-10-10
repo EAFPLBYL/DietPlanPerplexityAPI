@@ -1,39 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Diet Plan Calendar</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-  </head>
-  <body>
-    <div class="container">
-      <h1>Weekly Diet Plan</h1>
-      <!-- Form for entering calorie limit and selecting diet type -->
-      <form id="calorieForm">
-        <input
-          type="number"
-          id="caloryLimit"
-          placeholder="Enter calorie limit"
-          required
-        />
-        <select id="dietType" required>
-          <option value="">Select Diet Type</option>
-          <option value="ketogenic">Ketogenic</option>
-          <option value="paleo">Paleo</option>
-          <option value="vegetarian">Vegetarian</option>
-          <option value="vegan">Vegan</option>
-          <option value="mediterranean">Mediterranean</option>
-          <option value="dash">DASH</option>
-        </select>
-        <button type="submit">Generate Diet Plan</button>
-      </form>
 
-      <!-- Placeholder for the grid to display the diet plan -->
-      <div id="dietPlanGrid" class="diet-plan-grid"></div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet Plan Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&family=Orbitron:wght@400&display=swap" rel="stylesheet">
+    <style>
+        /* Optional styles for loading indicator */
+        #loadingIndicator {
+            display: none;
+            text-align: center;
+            font-size: 1.2em;
+            color: #007BFF;
+        }
+        
+        /* Style for the diet plan grid */
+        .diet-plan-grid {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .day-plan {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Optional: styling for buttons */
+        .btn-primary {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover,
+        .btn-secondary:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Diet Plan Generator</h1>
+        </header>
+        <main>
+            <form id="calorieForm" class="form-styled">
+                <div class="form-group">
+                    <label for="caloryLimit">Calorie Limit:</label>
+                    <input type="number" id="caloryLimit" name="caloryLimit" placeholder="Enter calorie limit" required min="1" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="dietType">Diet Type:</label>
+                    <select id="dietType" name="dietType" required>
+                        <option value="" disabled selected>Select a diet type</option>
+                        <option value="Keto">Keto</option>
+                        <option value="Vegan">Vegan</option>
+                        <option value="Paleo">Paleo</option>
+                        <option value="Mediterranean">Mediterranean</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary">Generate Diet Plan</button>
+            </form>
+
+            <div id="loadingIndicator">Loading...</div> <!-- Loading indicator -->
+            <div id="dietPlanGrid" class="diet-plan-grid"></div>
+
+            <div id="translationSection" class="translation-section">
+                <label for="languageSelect">Translate:</label>
+                <select id="languageSelect">
+                    <!-- Language options will be populated by script.js -->
+                </select>
+                <button id="translateButton" class="btn-secondary">Translate</button>
+            </div>
+        </main>
     </div>
 
-    <!-- Link the script file -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-  </body>
+</body>
+
 </html>
