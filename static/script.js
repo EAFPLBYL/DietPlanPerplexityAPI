@@ -4,14 +4,24 @@ document.addEventListener("DOMContentLoaded", function () {
   const languageSelect = document.getElementById("languageSelect");
   const dietPlanGrid = document.getElementById("dietPlanGrid");
   const loadingIndicator = document.getElementById("loadingIndicator");
+  const translationInProgress = document.getElementById(
+    "translationInProgress"
+  );
 
-  // Check if languageSelect is not null
-  if (!languageSelect) {
-    console.error("Language select element not found!");
+  // Check if all necessary elements are present
+  if (
+    !form ||
+    !translateButton ||
+    !languageSelect ||
+    !dietPlanGrid ||
+    !loadingIndicator ||
+    !translationInProgress
+  ) {
+    console.error("One or more elements are missing from the DOM.");
     return;
   }
 
-  // Predefined list of language codes (ISO 639-1) for LibreTranslate
+  // Predefined list of languages for LibreTranslate
   const languages = {
     en: "English",
     es: "Spanish",
@@ -35,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
     languageSelect.appendChild(option);
   });
 
-  // Handle form submission for generating the diet plan
+  // Handle form submission for diet plan generation
   form.addEventListener("submit", function (event) {
     event.preventDefault();
     const caloryLimit = document.getElementById("caloryLimit").value;
@@ -43,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!validateInputs(caloryLimit, dietType)) return;
 
-    loadingIndicator.style.display = "block";
+    loadingIndicator.style.display = "block"; // Show loading indicator
 
     fetch("/api/diet-plan", {
       method: "POST",
@@ -59,19 +69,23 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.json();
       })
       .then((data) => {
-        loadingIndicator.style.display = "none";
+        loadingIndicator.style.display = "none"; // Hide loading indicator
+        console.log("API Response:", data); // Log the API response
         if (data.days) {
-          renderDietPlan(data.days);
+          renderDietPlan(data.days); // Call function to render diet plan
+        } else {
+          console.error("No 'days' field in API response.");
+          alert("Unexpected API response format.");
         }
       })
       .catch((error) => {
-        loadingIndicator.style.display = "none";
+        loadingIndicator.style.display = "none"; // Hide loading indicator
         console.error("Error fetching diet plan:", error);
         alert("Failed to fetch diet plan: " + error.message);
       });
   });
 
-  // Validate inputs
+  // Validate form inputs
   function validateInputs(caloryLimit, dietType) {
     if (!caloryLimit || isNaN(caloryLimit) || caloryLimit <= 0) {
       alert("Please enter a valid positive calorie limit.");
@@ -91,66 +105,72 @@ document.addEventListener("DOMContentLoaded", function () {
       const dayElement = document.createElement("div");
       dayElement.classList.add("day-plan");
       dayElement.innerHTML = `
-            <h3>${new Date(day.day * 1000).toDateString()}</h3>
-            <div class="meals">
-                <h4>Meals:</h4>
-                <ul>${day.meals
-                  .map((meal) => `<li>${meal.type}: ${meal.description}</li>`)
-                  .join("")}</ul>
-            </div>
-            <div class="snacks">
-                <h4>Snacks:</h4>
-                <ul>${day.snacks
-                  .map(
-                    (snack) => `<li>${snack.type}: ${snack.description}</li>`
-                  )
-                  .join("")}</ul>
-            </div>
-            <div class="macros">
-                <h4>Macros:</h4>
-                <p>Protein: ${day.macros.protein}g</p>
-                <p>Carbs: ${day.macros.carbs}g</p>
-                <p>Fats: ${day.macros.fats}g</p>
-            </div>
-            <div class="notes">
-                <h4>Notes:</h4>
-                <p>${day.notes || "No additional notes."}</p>
-            </div>
-        `;
+              <h3>Day ${day.day}</h3>
+              <div class="meals">
+                  <h4>Meals:</h4>
+                  <ul>${day.meals
+                    .map((meal) => `<li>${meal.type}: ${meal.description}</li>`)
+                    .join("")}</ul>
+              </div>
+              <div class="snacks">
+                  <h4>Snacks:</h4>
+                  <ul>${day.snacks
+                    .map(
+                      (snack) => `<li>${snack.type}: ${snack.description}</li>`
+                    )
+                    .join("")}</ul>
+              </div>
+              <div class="macros">
+                  <h4>Macros:</h4>
+                  <p>Protein: ${day.macros.protein}g</p>
+                  <p>Carbs: ${day.macros.carbs}g</p>
+                  <p>Fats: ${day.macros.fats}g</p>
+              </div>
+              <div class="notes">
+                  <h4>Notes:</h4>
+                  <p>${day.notes || "No additional notes."}</p>
+              </div>
+          `;
       dietPlanGrid.appendChild(dayElement);
     });
   }
 
-  // Manual translation
+  // Translation handling
   translateButton.addEventListener("click", function () {
     const selectedLanguage = languageSelect.value;
     if (selectedLanguage) {
-      const textElements = document.querySelectorAll("h1, h3, h4, p, li");
+      const textElements = document.querySelectorAll(
+        "h1, h3, h4, p, li, label, button"
+      );
       const textsToTranslate = Array.from(textElements).map(
         (el) => el.textContent
       );
 
-      // Disable the button to prevent multiple clicks
+      // Disable the button and show translation progress
       translateButton.disabled = true;
+      translationInProgress.style.display = "block"; // Show translation in progress
 
       translateTextBatch(textsToTranslate, selectedLanguage)
         .then((translatedTexts) => {
           translatedTexts.forEach((translatedText, index) => {
-            textElements[index].textContent = translatedText;
+            textElements[index].textContent = translatedText; // Update text with translated values
           });
-          translateButton.disabled = false; // Re-enable button after translation
+          // Re-enable button and hide the translation progress indicator
+          translateButton.disabled = false;
+          translationInProgress.style.display = "none"; // Hide translation in progress
         })
         .catch((error) => {
           console.error("Error translating content:", error);
           alert("Translation failed. Please try again.");
-          translateButton.disabled = false; // Re-enable button if error occurs
+          translateButton.disabled = false; // Re-enable the button
+          translationInProgress.style.display = "none"; // Hide translation in progress
         });
     } else {
       alert("Please select a language for translation.");
     }
   });
 
-  // Translate text in batch
+  // Function to translate text in batches using LibreTranslate API
   async function translateTextBatch(texts, targetLanguage) {
     try {
       const response = await fetch("/translate", {
@@ -165,9 +185,9 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const data = await response.json();
-      return data.translations;
+      return data.translations; // Return translated texts
     } catch (error) {
-      throw error; // Re-throw the error so that it can be caught in the main function
+      throw error; // Rethrow error for handling in the main function
     }
   }
 });

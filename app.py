@@ -155,10 +155,10 @@ def get_location():
         logging.error(f"Failed to fetch IP info: {e}")
         return jsonify({"error": "Failed to fetch IP info"}), 500
 
+# API endpoint for LibreTranslate integration
 @app.route('/translate', methods=['POST'])
 def translate_text():
     """API endpoint to translate text using LibreTranslate."""
-    
     data = request.json
     texts = data.get('q')  # Expecting a list of texts
     target = data.get('target')
